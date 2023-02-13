@@ -1,0 +1,170 @@
+do for _,v in pairs(getactors()) do if (tostring(v)=="lol") then syn.run_on_actor(v,'[[
+            local IsAlive=function()--check if player is alive
+                if game.Players.LocalPlayer.Character and not game.Workspace:FindFirstChild("MenuLobby")then
+                    return true
+                end
+                return false
+            end
+            local ModVisScope=function(x)--modify scope visibility true for invisible false for visible
+                x=not x
+                for _,v in pairs(game.Players.LocalPlayer.PlayerGui.UnscaledScreenGui.DisplayScope:GetChildren())do
+                    for _,c in pairs(v:GetChildren())do
+                        if c:IsA("Frame")then
+                            c.Visible=x
+                        end
+                    end
+                    if v.Name=="ImageFrontLayer"then
+                        v.Visible=x
+                    elseif v.Name=="ImageRearLayer"then
+                        v.Image=x and "rbxassetid://981376749"or ""--epic id
+                    end
+                end
+            end
+            local Options={--optinos folder (dont worry u dont have to set these we have a ui now)
+                Enabled=false,
+                Animation=false,
+                Reset=false,
+                Sway=false,
+                Scope=false,
+                StaticX=false,
+                StaticY=false,
+                StaticZ=false,
+                Stable=false,
+            }
+            --epic coasting ui lib
+            _G.UILib=_G.UILib or loadstring(game:HttpGet("https://raw.githubusercontent.com/The3Bakers4565/Spicy-Bagel/main/Functions/UI/Coasting.lua"))()
+            local Main=_G.UILib:CreateTab("Gun Mods")--tabs
+            local MainSection=Main:CreateSection("Fast Animations")--section 1
+            local MiscSection=Main:CreateSection("Misc")--section 1
+            MainSection:CreateToggle("Enabled",function(x)
+                Options.Enabled=x
+                ModVisScope(Options.Enabled and Options.Scope)
+            end)
+            MainSection:CreateToggle("Instant Animations",function(x)
+                Options.Animation=x
+            end)
+            MainSection:CreateToggle("Instant Reset Animations",function(x)
+                Options.Reset=x
+            end)
+            MiscSection:CreateToggle("Remove Walking Sway",function(x)
+                Options.Sway=x
+            end)
+            MiscSection:CreateToggle("Remove Black Scope",function(x)
+                Options.Scope=x
+                ModVisScope(Options.Enabled and Options.Scope)
+            end)
+            MiscSection:CreateToggle("Stable Gun",function(x)
+                Options.Stable=x
+            end)
+            MiscSection:CreateToggle("Static Cam X",function(x)
+                Options.StaticX=x
+            end)
+            MiscSection:CreateToggle("Static Cam Y",function(x)
+                Options.StaticY=x
+            end)
+            MiscSection:CreateToggle("Static Cam Z",function(x)
+                Options.StaticZ=x
+            end)
+            for _,v in pairs(getgc(true))do
+                if type(v)=="table"then
+                    if rawget(v,"walkSway")then
+                        print("walksway")
+                        local a
+                        a=hookfunction(v.walkSway,function(...)--was .gunbob before but now its walksway
+                            if Options.Enabled and Options.Sway then
+                                return CFrame.new()
+                            end
+                            return a(...)
+                        end)
+                    end
+                elseif type(v)=="function"then
+                    if debug.getinfo(v).name=="player"then
+                        print("player")
+                        local an
+                        an=hookfunction(v,function(b,c)
+                            if Options.Enabled and Options.Animation then
+                                if rawget(c,"timescale")then
+                                    c.timescale=0--i realized the timescale was fuckin up so heres fixed one
+                                end
+                                if rawget(c,"stdtimescale")then
+                                    c.stdtimescale=0
+                                end
+                            end
+                            if rawget(c,"resettime")and Options.Enabled and Options.Reset then
+                                c.resettime=0
+                            end
+                            return an(b,c)
+                        end)
+                    end
+                end
+            end
+            local ToAngles=function(cf)--bro toeuler aint workin bro
+                local part=Instance.new("Part")
+                part.CFrame=cf
+                return part.Orientation
+            end
+            local ApplyAngles=function(cf,an)--pro gamer angle
+                local part=Instance.new("Part")
+                part.CFrame=cf
+                part.Orientation=Vector3.new(an.X,an.Y,an.Z)
+                return part.CFrame
+            end
+            local degfix=math.deg(1)--deg bugs tf out so we use fix
+            local cam=Vector2.new()
+            local mt=getrawmetatable(game)
+            local oldNamecall=mt.__namecall
+            local oldIndex=mt.__index
+            setreadonly(mt,false)
+            mt.__namecall=newcclosure(function(a,b,c,d,e,...)--old method but still works
+                local method=getnamecallmethod()
+                if tostring(method)=="FireServer"and Options.Enabled and c=="repupdate"then
+                    cam=e--camera angle (couldnt find it in getgc sorry)
+                end
+                return oldNamecall(a,b,c,d,e,...)
+            end)
+            game.Workspace.CurrentCamera:GetPropertyChangedSignal("CFrame"):Connect(function()
+                if Options.Enabled and IsAlive()then--simple static like previous update
+                    local angles=ToAngles(game.Workspace.CurrentCamera.CFrame)
+                    if Options.StaticX then--more static options O_o
+                        angles=Vector3.new(cam.X*degfix,angles.Y,angles.Z)
+                    end
+                    if Options.StaticY then
+                        angles=Vector3.new(angles.X,cam.Y*degfix,angles.Z)
+                    end
+                    if Options.StaticZ then
+                        angles=Vector3.new(angles.X,angles.Y,0)
+                    end
+                    game.Workspace.CurrentCamera.CFrame=
+                    ApplyAngles(game.Workspace.CurrentCamera.CFrame,angles)
+                end
+            end)
+            local FixStuffs=function(v)
+                if v.Name=="Main"and v:FindFirstChild("Trigger")then
+                    v.Trigger.Motor6D:GetPropertyChangedSignal("C0"):Connect(function()
+                        if Options.Enabled and Options.Stable then
+                            if v.Trigger.Motor6D.C0~=CFrame.new(v.Trigger.Motor6D.C0.Position)*CFrame.Angles(cam.X,0,0)then
+                                v.Trigger.Motor6D.C0=
+                                    CFrame.new(v.Trigger.Motor6D.C0.Position)*
+                                    CFrame.Angles(cam.X,0,0)
+                            end
+                        end
+                    end)
+                else
+                    if v:FindFirstChild("Arm")then
+                        v.Arm.Motor6D:GetPropertyChangedSignal("C0"):Connect(function()
+                            if Options.Enabled and Options.Stable then
+                                if v.Arm.Motor6D.C0~=CFrame.new(100,0,0)then
+                                    v.Arm.Motor6D.C0=CFrame.new(100,0,0)
+                                end
+                            end
+                        end)
+                    end
+                end
+            end
+            game.Workspace.CurrentCamera.ChildAdded:Connect(function(x)--wow im not using render stepped :!:!:>!>!>!>?!?!?!?
+                FixStuffs(x)
+            end)
+            for _,v in pairs(game.Workspace.CurrentCamera:GetChildren())do--fix on load
+                FixStuffs(v)
+            end
+        ]]');end end end
