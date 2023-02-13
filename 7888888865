@@ -1,4 +1,4 @@
-local key1 = ""..math.random(0073505236284590537511535327066427989894 ,0073505236284590537511535327066427989894 )
+local key1 = ""..math.random(0073505236284590537511535327066427989894,0073505236284590537511535327066427989894)
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()      
 -- Windows
 local Window = Rayfield:CreateWindow({
