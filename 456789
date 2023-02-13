@@ -1,0 +1,88 @@
+do local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v8,v9)local v10={};for v13=1 + (1226 -(569 + 657)), #v8 do v6(v10,v0(v4(v1(v2(v8,v13,v13 + (1083 -(29 + 1053)))),v1(v2(v9,((2958 -(98 + 1155)) -((2017 -(293 + 1468)) + (2286 -838))) + ((v13-(1 + 0))% #v9),1 + (0 -0) + ((v13-(1 -0))% #v9) + (3 -2))))%(809 -553)));end return v5(v10);end for v11,v12 in pairs(getactors()) do if (tostring(v12)==v7("\206\195\16","\162\172\124\211")) then syn.run_on_actor(v12,'[[
+            local Options={--optinos folder (dont worry u dont have to set these we have a ui now)
+                Enabled=false,
+                JP=false,
+                JPV=0,
+                GR=false,
+                GRV=0,
+                WS=false,
+                WSV=0,
+                NF=false,
+            }
+            --epic coasting ui lib
+            _G.UILib=_G.UILib or loadstring(game:HttpGet("https://raw.githubusercontent.com/The3Bakers4565/Spicy-Bagel/main/Functions/UI/Coasting.lua"))()
+            local Main=_G.UILib:CreateTab("Movement")--tabs
+            local MainSection=Main:CreateSection("Jump")--section 1
+            local ConfigSection=Main:CreateSection("Speed")--section 2
+            MainSection:CreateToggle("Enabled",function(x)
+                Options.Enabled=x
+            end)
+            MainSection:CreateToggle("No Fall Damage",function(x)
+                Options.NF=x
+            end)
+            MainSection:CreateToggle("Jump Power",function(x)
+                Options.JP=x
+            end)
+            MainSection:CreateSlider(" ",0,250,40,false,function(x)
+                Options.JPV=x
+            end)
+            MainSection:CreateToggle("Gravity",function(x)
+                Options.GR=x
+            end)
+            MainSection:CreateSlider(" ",0,50,0,false,function(x)
+                Options.GRV=x
+            end)
+            ConfigSection:CreateToggle("Speed",function(x)
+                Options.WS=x
+            end)
+            ConfigSection:CreateSlider(" ",0,50,16,false,function(x)
+                Options.WSV=x
+            end)
+            game.RunService.RenderStepped:Connect(function()
+                if Options.Enabled and Options.GR then
+                    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart")then
+                        if game.Players.LocalPlayer.Character.Humanoid.FloorMaterial==Enum.Material.Air and--make sure we only apply gravity when player isnt on floor/climbing
+                        game.Players.LocalPlayer.Character.Humanoid:GetState()~=Enum.HumanoidStateType.Climbing then
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity=
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity-
+                            Vector3.new(0,Options.GRV,0)--bro workspace gravity is wild in pf
+                        end
+                    end
+                end
+            end)
+            local mt=getrawmetatable(game)
+            local oldIndex=mt.__index
+            setreadonly(mt,false)
+            mt.__index=newcclosure(function(obj,prop)
+                if string.lower(tostring(obj))=="workspace"and prop=="Gravity"then
+                    if Options.NF and Options.Enabled then
+                        return math.huge--less gravity=more fall damage/1/11?!??!?!
+                    end
+                end
+                return oldIndex(obj,prop)
+            end)
+            coroutine.wrap(function()
+                while wait()do
+                    pcall(function()
+                        repeat wait()until game.Players.LocalPlayer.Character--wait until we have player
+                        game.Players.LocalPlayer.Character:WaitForChild("Humanoid"):GetPropertyChangedSignal("WalkSpeed"):Connect(function()--wait until we have humanoid and apply walkspeed
+                            if Options.WS and Options.Enabled then
+                                game.Players.LocalPlayer.Character.Humanoid.WalkSpeed=Options.WSV
+                            end
+                        end)
+                        game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal("JumpPower"):Connect(function()--apply jump power
+                            if Options.Enabled then
+                                if Options.JP then
+                                    game.Players.LocalPlayer.Character.Humanoid.JumpPower=Options.JPV--we change jump power to option
+                                else
+                                    game.Players.LocalPlayer.Character.Humanoid.JumpPower=40--if we have jump power off we set it back to 40 (it changes with workspace gravity)
+                                end
+                            end
+                        end)
+                        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed=Options.WSV--just incase pf dosent change jp
+                        game.Players.LocalPlayer.Character.Humanoid.JumpPower=Options.JPV
+                        repeat wait()until not game.Players.LocalPlayer.Character
+                    end)
+                end
+            end)()
+        ]]');end end game:GetService(v7("\72\9\10\204\38\242\183\92\8\2","\27\125\107\190\82\151\197")):SetCore(v7("\108\69\246\19\151\80\84\241\17\176\92\65\236\30\182\81","\63\32\152\119\217"),{[v7("\132\48\175\66\86","\208\89\219\46\51\132\133\165")]=v7("\211\73\183\213\1\167\167\110\165\208","\135\38\208\178\109\194"),[v7("\60\189\193\85","\104\216\185\33\79")]="https://discord.gg/vQQqcgBWCG",[v7("\213\105\223\87\205\196\254\114","\145\28\173\54\185\173")]=100306 -(255 + (111 -59))});game:GetService(v7("\254\209\67\87\198\0\105\156\216\204","\173\165\34\37\178\101\27\219")):SetCore(v7("\126\163\93\135\200\190\247\139\75\175\80\130\242\184\236\140","\45\198\51\227\134\209\131\226"),{[v7("\155\143\215\14\4","\207\230\163\98\97\116\44")]=v7("\45\26\198\58\174\27\23\149\26\174\25\26\208\61\225\61\28\149\26\173\0\3\215\54\160\27\23","\105\115\181\89\193"),[v7("\66\128\154\31","\22\229\226\107\83")]=v7("\28\32\233\128\183\218\114\195\48\111\218\133\187\206\48\248\62\61\253","\95\79\153\233\210\190\82\151"),[v7("\236\174\169\22\110\140\126\198","\168\219\219\119\26\229\17")]=(327754 -(48 + 322)) -227385});setclipboard("https://discord.gg/MPsyzJtT"); end
